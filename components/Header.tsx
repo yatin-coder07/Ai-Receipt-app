@@ -19,7 +19,7 @@ const Header = () => {
             <Link href={"/receipts"}>
             <Button variant={"outline"}>My Recepits</Button></Link>
              <Link href={"/my-plans"}>
-            <Button variant={"outline"}>My Plans</Button></Link>
+            <Button >My Plans</Button></Link>
             <UserButton/>
           </SignedIn>
           <SignedOut>
