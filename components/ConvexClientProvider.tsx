@@ -6,26 +6,7 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { SchematicProvider , useSchematicEvents  } from "@schematichq/schematic-react";
 
-let convexClient: ConvexReactClient | null = null;
-
-function getConvexClient(): ConvexReactClient {
-  if (convexClient) {
-    return convexClient;
-  }
-
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-
-  if (!convexUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_CONVEX_URL environment variable is not set. " +
-      "Please set it to your Convex deployment URL (e.g., https://your-deployment.convex.cloud). " +
-      "You can find this URL in your Convex dashboard."
-    );
-  }
-
-  convexClient = new ConvexReactClient(convexUrl);
-  return convexClient;
-}
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 const SchematicWrapped = ({children}:{children:React.ReactNode})=>{
   const {identify} = useSchematicEvents();
@@ -67,8 +48,6 @@ export default function ConvexClientProvider({
 }: {
   children: ReactNode;
 }) {
-  const convex = getConvexClient();
-  
   return (
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       <SchematicProvider publishableKey={process.env.NEXT_PUBLIC_SCHEMATIC_KEY!}>
