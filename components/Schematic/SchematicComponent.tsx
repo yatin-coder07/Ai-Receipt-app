@@ -1,11 +1,11 @@
-import { getTemporaryaccessToken } from '../../actions/GetTemporaryAccessToken'
+import { GetTemporaryaccessToken } from '../../actions/GetTemporaryAccessToken'
 import SchematicEmbed from './SchematicEmbed'
 
 async function SchematicComponent({componentId}:{componentId?:string}) {
     if(!componentId){
         return null
     }
-    const accessToken = await getTemporaryaccessToken()
+    const accessToken = await GetTemporaryaccessToken()
 
     if(!accessToken){
         throw new Error("No access token found for user")
