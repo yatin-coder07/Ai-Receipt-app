@@ -6,7 +6,7 @@ import { SchematicClient } from "@schematichq/schematic-typescript-node";
 const apiKey = process.env.SCHEMATIC_API_KEY;
 const client = new SchematicClient({ apiKey });
 
-export async function getTemporaryaccessToken(){
+export async function GetTemporaryaccessToken(){
     const user = await currentUser();
 
     if(!user){
