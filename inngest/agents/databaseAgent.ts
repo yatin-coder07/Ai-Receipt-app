@@ -1,13 +1,14 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { convex } from "@/lib/ConvexClient";
+import { client } from "@/lib/schematic";
 import { createAgent, createTool, openai } from "@inngest/agent-kit";
 import {z} from "zod";
 
 const saveToDatabaseTool = createTool({
     name: "save-to-database",
     description: "Saves the given data to the convex database.",
-    parameters: z.object({
+    parameters: z.object({  
         fileDisplayName: z
             .string()
             .describe(
@@ -83,7 +84,30 @@ const saveToDatabaseTool = createTool({
                       items,
                     }
                   );
-                  return { addedToDb: "Success", userId };
+                  //tracks event in schematic
+                  await client.track({
+                    event:"scan",
+                    company:{
+                        id:userId
+                    },
+                    user:{
+                        id:userId
+                    }
+
+                  })
+                  //returning data for next step returns means to save this data and give  it to ournext step
+                  return { addedToDb: "Success",
+                    receiptId,
+                    fileDisplayName
+                    ,
+                    merchantAddress,
+                    merchantContact,
+                    merchantName,
+                    transactionAmount,
+                    transactionDate,
+                     userId,
+                    currency,
+                receiptSummary,items };
                 } catch (error) {
                   return {
                     addedToDb: "Failed",

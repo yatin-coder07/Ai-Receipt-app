@@ -8,6 +8,8 @@ import {
   import {createServer} from "@inngest/agent-kit/server";
 import Events from "./constants";
 import { inngest } from "./client";
+import { databaseAgent } from "./agents/databaseAgent";
+import { receiptScanningAgent } from "./agents/receiptScanningAgent";
 
   
 const agentNetwork = createNetwork({
