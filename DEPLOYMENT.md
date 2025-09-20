@@ -13,10 +13,26 @@ This guide will help you deploy your Receipt Scanning app to Vercel.
 ## Environment Variables Setup
 
 ### 1. Convex Setup
-1. Go to your [Convex Dashboard](https://dashboard.convex.dev/)
-2. Create a new project or use an existing one
-3. Copy your deployment URL (it looks like `https://your-deployment.convex.cloud`)
-4. Set this as `NEXT_PUBLIC_CONVEX_URL` in Vercel
+1. **Install Convex CLI** (if not already installed):
+   ```bash
+   npm install -g convex
+   ```
+
+2. **Set up your Convex project**:
+   ```bash
+   cd my-reciept-app
+   npx convex dev
+   ```
+   This will:
+   - Create a new Convex project (if you don't have one)
+   - Give you a deployment URL like `https://your-deployment.convex.cloud`
+   - Start the development server
+
+3. **Get your deployment URL**:
+   - Copy the URL that appears in the terminal output
+   - Or find it in your [Convex Dashboard](https://dashboard.convex.dev/)
+
+4. **Set this URL as `NEXT_PUBLIC_CONVEX_URL` in Vercel**
 
 ### 2. Clerk Setup
 1. Go to your [Clerk Dashboard](https://dashboard.clerk.com/)
@@ -54,7 +70,14 @@ Set one or both of these environment variables in Vercel:
 3. Import your GitHub repository
 
 ### 2. Configure Environment Variables
-In your Vercel project settings, add all the environment variables listed above.
+In your Vercel project settings:
+
+1. Go to your project dashboard
+2. Click on "Settings" tab
+3. Click on "Environment Variables" in the left sidebar
+4. Add each environment variable by clicking "Add New"
+
+**Important:** Do NOT use the `@` syntax in Vercel. Just enter the variable name and value directly.
 
 ### 3. Deploy
 1. Click "Deploy" in Vercel
