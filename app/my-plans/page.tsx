@@ -1,6 +1,8 @@
-"use client"
 import SchematicComponent from '@/components/Schematic/SchematicComponent'
 import React from 'react'
+
+// Force dynamic rendering since SchematicComponent uses server-side authentication
+export const dynamic = 'force-dynamic'
 
 export default function MyPlansPage() {
   const componentId = process.env.NEXT_PUBLIC_SCHEMATIC_CUSTOMER_PORTAL_COMPONENT_ID
