@@ -1,7 +1,8 @@
+"use client"
 import SchematicComponent from '@/components/Schematic/SchematicComponent'
 import React from 'react'
 
-const MyPlan = () => {
+export default function MyPlansPage() {
   const componentId = process.env.NEXT_PUBLIC_SCHEMATIC_CUSTOMER_PORTAL_COMPONENT_ID
 
   if (!componentId) {
@@ -25,4 +26,3 @@ const MyPlan = () => {
   )
 }
 
-export default MyPlan
