@@ -3,25 +3,45 @@
 import { currentUser } from "@clerk/nextjs/server"
 
 import { SchematicClient } from "@schematichq/schematic-typescript-node";
+
 const apiKey = process.env.SCHEMATIC_API_KEY;
+
+if (!apiKey) {
+    console.error("SCHEMATIC_API_KEY environment variable is not set");
+}
+
 const client = new SchematicClient({ apiKey });
 
 export async function GetTemporaryaccessToken(){
-    const user = await currentUser();
+    try {
+        if (!apiKey) {
+            console.error("SCHEMATIC_API_KEY is missing");
+            return null;
+        }
 
-    if(!user){
-        console.log("nou user found")
-        return null
+        const user = await currentUser();
+
+        if(!user){
+            console.log("No user found");
+            return null;
+        }
+
+        console.log(`Issuing temporary access token for user: ${user.id}`);
+        
+        const resp = await client.accesstokens.issueTemporaryAccessToken({
+            resourceType:"company",
+            lookup:{id:user.id}
+        });
+        
+        console.log("Token response received:",
+            resp.data ? "Token received" : "No token in response"
+        );
+        
+        return resp.data?.token;
+    } catch (error) {
+        console.error("Error getting temporary access token:", error);
+        return null;
     }
-    console.log(`issuing temporary access token for user:${user.id}`);
-    const resp = await client.accesstokens.issueTemporaryAccessToken({
-        resourceType:"company",
-        lookup:{id:user.id}
-    });
-    console.log(" token response recieved:",
-        resp.data?"token recieved  ":"No token in response"
-    )
-    return resp.data?.token;
 }
 
 //Checks who's logged in

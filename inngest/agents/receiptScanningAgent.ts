@@ -1,6 +1,5 @@
 import { createAgent, createTool } from "@inngest/agent-kit";
-import { anthropic, openai } from "inngest";
-import { err } from "inngest/types";
+import { anthropic, openai } from "@inngest/ai";
 import {z} from "zod"
 
 const parsedPdfTool=createTool({
@@ -15,7 +14,7 @@ const parsedPdfTool=createTool({
                 model: anthropic({
                     model: "claude-3-5-sonnet-20241022",
                     defaultParameters: {
-                        max_tokens: 3094,
+                        max_completion_tokens: 3094,
                     },
                 }),
                 body: {

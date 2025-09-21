@@ -5,6 +5,8 @@ import { api } from "@/convex/_generated/api";
 import { convex } from "@/lib/ConvexClient";
 import { currentUser } from "@clerk/nextjs/server";
 import { getFileDownloadUrl } from "./getFileDownloadUrl";
+import { inngest } from "@/inngest/client";
+import Events from "@/inngest/constants";
 
 /**
  * Server action to upload a PDF file to Convex storage
@@ -62,10 +64,31 @@ const { storageId } = await uploadResponse.json();
  // genarate file url
  const fileUrl = await getFileDownloadUrl(storageId);
 
- //trigger indgest agents
- //TODO:
-
+ //trigger inngest agents
+ console.log("🚀 Attempting to send Inngest event...");
+ console.log("Event name:", Events.EXTRACT_DATA_FROM_PDF_AND_SAVE_TO_DATABASE);
+ console.log("File URL:", fileUrl.downloadUrl);
+ console.log("Receipt ID:", recieptId);
+ 
+ try {
+  const inngestResult = await inngest.send({
+    name: Events.EXTRACT_DATA_FROM_PDF_AND_SAVE_TO_DATABASE,
+    data: {
+      url: fileUrl.downloadUrl,
+      receiptId: recieptId, // Fixed typo: recieptId -> receiptId
+    },
+  });
+  console.log("✅ Inngest event sent successfully for receipt:", recieptId);
+  console.log("Inngest result:", inngestResult);
+  console.log("🎯 Event should now be triggering the Inngest workflow...");
+ } catch (inngestError) {
+  console.error("❌ Failed to send Inngest event:", inngestError);
+  console.error("Error details:", inngestError instanceof Error ? inngestError.message : String(inngestError));
+  // Don't fail the entire upload if Inngest fails
+  // The receipt is still saved to the database
+ }
  return{
+  
   success:true,
   data:{
     recieptId,

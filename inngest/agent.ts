@@ -1,10 +1,9 @@
 import {
     createNetwork,
     createAgent,
-    openai,
-    anthropic,
     getDefaultRoutingAgent,
   } from "@inngest/agent-kit";
+import { openai, anthropic } from "@inngest/ai";
   import {createServer} from "@inngest/agent-kit/server";
 import Events from "./constants";
 import { inngest } from "./client";

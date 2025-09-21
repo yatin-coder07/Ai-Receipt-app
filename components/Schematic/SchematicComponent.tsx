@@ -3,17 +3,44 @@ import SchematicEmbed from './SchematicEmbed'
 
 async function SchematicComponent({componentId}:{componentId?:string}) {
     if(!componentId){
-        return null
+        return (
+            <div className='text-center p-8 bg-red-50 border border-red-200 rounded-lg'>
+                <p className='text-red-800'>
+                    Component ID is required to load the customer portal.
+                </p>
+            </div>
+        )
     }
-    const accessToken = await GetTemporaryaccessToken()
+    
+    try {
+        const accessToken = await GetTemporaryaccessToken()
 
-    if(!accessToken){
-        throw new Error("No access token found for user")
+        if(!accessToken){
+            return (
+                <div className='text-center p-8 bg-red-50 border border-red-200 rounded-lg'>
+                    <p className='text-red-800'>
+                        Unable to authenticate. Please make sure you're logged in and try again.
+                    </p>
+                </div>
+            )
+        }
+
+        return (
+            <SchematicEmbed accessToken={accessToken} componentId={componentId}/>
+        )
+    } catch (error) {
+        console.error('Error loading customer portal:', error)
+        return (
+            <div className='text-center p-8 bg-red-50 border border-red-200 rounded-lg'>
+                <p className='text-red-800'>
+                    Failed to load customer portal. Please check your configuration and try again.
+                </p>
+                <p className='text-sm text-red-600 mt-2'>
+                    Error: {error instanceof Error ? error.message : 'Unknown error'}
+                </p>
+            </div>
+        )
     }
-  return (
-
-    <SchematicEmbed accessToken={accessToken} componentId={componentId}/>
-  )
 }
 
 export default SchematicComponent

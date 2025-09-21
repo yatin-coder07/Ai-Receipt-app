@@ -2,7 +2,8 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { convex } from "@/lib/ConvexClient";
 import { client } from "@/lib/schematic";
-import { createAgent, createTool, openai } from "@inngest/agent-kit";
+import { createAgent, createTool } from "@inngest/agent-kit";
+import { openai } from "@inngest/ai";
 import {z} from "zod";
 
 const saveToDatabaseTool = createTool({
@@ -49,8 +50,8 @@ const saveToDatabaseTool = createTool({
     )
 ),
     }),
-    handler:async({params , context})=>{
-       const{
+    handler: async ({params, context}) => {
+       const {
         fileDisplayName,
         receiptId,
         merchantAddress,
@@ -61,77 +62,82 @@ const saveToDatabaseTool = createTool({
         receiptSummary,
         currency,
         items
-       }=params;
+       } = params;
 
        const result = await context.step?.run(
         "save-receipt-to-database",
-        async()=>{
-            async () => {
-                try {
-                  // Call the Convex mutation to update the receipt with extracted data
-                  const { userId } = await convex.mutation(
-                    api.receipts.updateReceiptWithExtractedData,
-                    {
-                      id: receiptId as Id<"receipts">,
-                      fileDisplayName,
-                      merchantName,
-                      merchantAddress,
-                      merchantContact,
-                      transactionDate,
-                      transactionAmount,
-                      receiptSummary,
-                      currency,
-                      items,
-                    }
-                  );
-                  //tracks event in schematic
-                  await client.track({
-                    event:"scan",
-                    company:{
-                        id:userId
-                    },
-                    user:{
-                        id:userId
-                    }
-
-                  })
-                  //returning data for next step returns means to save this data and give  it to ournext step
-                  return { addedToDb: "Success",
-                    receiptId,
-                    fileDisplayName
-                    ,
-                    merchantAddress,
-                    merchantContact,
-                    merchantName,
-                    transactionAmount,
-                    transactionDate,
-                     userId,
-                    currency,
-                receiptSummary,items };
-                } catch (error) {
-                  return {
-                    addedToDb: "Failed",
-                    error: error instanceof Error ? error.message : "Unknown error",
-                  };
+        async () => {
+            try {
+              // Call the Convex mutation to update the receipt with extracted data
+              const userId = await convex.mutation(
+                api.receipts.updateReceiptWithExtractedData,
+                {
+                  id: receiptId as Id<"receipts">,
+                  fileDisplayName,
+                  merchantName,
+                  merchantAddress,
+                  merchantContact,
+                  transactionDate,
+                  transactionAmount,
+                  receiptSummary,
+                  currency,
+                  items,
                 }
+              );
+              
+              //tracks event in schematic
+              if (client) {
+                await client.track({
+                  event:"scan",
+                  company:{
+                      id: userId
+                  },
+                  user:{
+                      id: userId
+                  }
+                });
               }
-        }
-       );
-       if (result.addedToDb === "Success") {
+              
+              //returning data for next step returns means to save this data and give  it to ournext step
+              return { 
+                addedToDb: "Success",
+                receiptId,
+                fileDisplayName,
+                merchantAddress,
+                merchantContact,
+                merchantName,
+                transactionAmount,
+                transactionDate,
+                userId,
+                currency,
+                receiptSummary,
+                items 
+              };
+            } catch (error) {
+              return {
+                addedToDb: "Failed",
+                error: error instanceof Error ? error.message : "Unknown error",
+              };
+            }
+          }
+        );
+       
+       if (result && result.addedToDb === "Success") {
         // Only set KV values if the operation was successful
-        context.network.state.kv.set("saved-to-database", true);
+        context.network.state.kv.set("saved-to-database", "true");
         context.network.state.kv.set("receipt", receiptId);
-
+       }
+       
+       return result;
     }
-    return result;
-}});
+});
 
 export const databaseAgent = createAgent({
     name: "Database Agent",
     description: "responsible for taking key information regarding receipts and saving it to the convex database.",
     system: "You are a helpful assistant that takes key information regarding receipts and saves it to the convex database.",
     model: openai({
-        model: "gpt-40-mini",
+        model: "gpt-4o-mini",
         defaultParameters: {
             max_completion_tokens: 1000,
         },

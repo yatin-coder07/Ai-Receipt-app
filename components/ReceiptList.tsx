@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import {
