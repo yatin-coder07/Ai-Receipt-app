@@ -1,6 +1,8 @@
 import { GetTemporaryaccessToken } from '../../actions/GetTemporaryAccessToken'
 import SchematicEmbed from './SchematicEmbed'
 
+export const dynamic = 'force-dynamic'
+
 async function SchematicComponent({componentId}:{componentId?:string}) {
     if(!componentId){
         return (
