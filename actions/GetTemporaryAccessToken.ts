@@ -20,9 +20,10 @@ export async function GetTemporaryaccessToken(){
         }
 
         const user = await currentUser();
+        console.log("Current user in server action:", user ? `User ID: ${user.id}` : "No user found");
 
         if(!user){
-            console.log("No user found");
+            console.log("No user found - this might be due to middleware configuration or authentication context");
             return null;
         }
 
@@ -37,7 +38,12 @@ export async function GetTemporaryaccessToken(){
             resp.data ? "Token received" : "No token in response"
         );
         
-        return resp.data?.token;
+        if (!resp.data?.token) {
+            console.error("No token in response from Schematic API");
+            return null;
+        }
+        
+        return resp.data.token;
     } catch (error) {
         console.error("Error getting temporary access token:", error);
         return null;
